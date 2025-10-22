@@ -1,159 +1,131 @@
-GigConnect - Full Stack Freelancer Platform
+# GigConnect (Frontend)
 
-GigConnect is a full-stack web application that connects freelancers with clients. Clients can post gigs, and freelancers can create profiles, browse available gigs, and apply. The project is built using React, Node.js/Express, and MongoDB.
+A lightweight React frontend for a freelance marketplace prototype. This project provides user flows for clients and freelancers, an admin dashboard, gigs management, messaging (real-time via sockets), and a simple payments flow (mocked in development).
 
-Table of Contents
+## Tech Stack
 
-Features
---Tech Stack
---Frontend Setup
---Backend Setup
---Database Setup
---Folder Structure
+- Frontend: React.js, Bootstrap, HTML5, CSS3, JavaScript
+- Backend: Node.js, Express.js
+- Database: MongoDB 
 
-Usage
+## Table of contents
 
---Future Enhancements
---Features Freelancer
---Register/login and create profile
---Update profile with skills, experience, and location
---Browse available gigs
+- Project overview
+- Features
+- Roles and flows (Freelancer, Client, Admin)
+- How to run (development)
+- Environment & mock API behavior
+- Key files and where to look
+- Troubleshooting / common notes
+- Next steps / contributors
 
-Apply to gigs
+## Project overview
 
---View applied gigs and status
---Client
---Register/login
---Post new gigs
---View applications for posted gigs
---Track gig status (open, in-progress, completed)
+GigConnect is a single-page React application built with functional components and React Hooks. The frontend talks to an API via `src/services/api.js` and uses a small socket client (`src/services/socket.js`) for messaging. In development this repo uses a mock API implementation so you can run and explore the UI without a backend server.
 
-Admin
+## Features
 
---Manage users (freelancers/clients)
---Moderate gigs and applications
---Tech Stack
+- User registration & login (freelancer and client)
+- Freelancer profiles (bio, skills, hourly rate, rating)
+- Create, list and manage gigs (create, delete, view my gigs)
+- Search / Find freelancers with filters (skills, location, price, rating)
+- Real-time messaging (conversations and chat UI) using sockets
+- Admin dashboard: stats, user and gig management
+- Mocked payments flow for testing payments in development
 
-Frontend
+## Roles and flows
 
---React.js (with React Router)
---Bootstrap 5 & custom CSS for styling
+Freelancer and Client flows are similar, with freelancer profiles containing additional fields.
 
-Axios for API requests
+Freelancer registration (recommended fields):
+- Name
+- Email
+- Password
+- confirm Password
+- Location
+- After registering, complete your freelancer profile: bio, skills (comma separated), hourlyRate, location, and availability.
 
---Context API for state management
+Client registration (recommended fields):
+- Name
+- Email
+- Password
+- confirm Password
+- Location
+- Clients can post gigs and message freelancers.
 
-Backend
+Admin login (development/mock):
+- Email: `admin@gigconnect.com`
+- Password: `admin123`
 
---Node.js & Express.js
---MongoDB (database)
---Mongoose (MongoDB ODM)
---JWT Authentication
---bcrypt for password hashing
---CORS
+Note: In development, the mock API will return an admin user when the credentials above are used. Otherwise, the mock API infers role from the provided email (emails containing the string "freelancer" will be treated as freelancer accounts). See `src/services/api.js` for the exact mock behavior.
 
-Database
+## How to run (development)
 
---MongoDB Atlas (cloud-based database)
---Collections:
---users → stores freelancers, clients, admin accounts
---profiles → freelancer profiles
---gigs → client gigs and applications
+Prerequisites:
+- Node.js (v14+ recommended)
+- npm (or yarn)
 
-Frontend Setup
+1. Install dependencies
 
-Navigate to frontend folder:
+	npm install
 
----cd gigconnect-frontend
+2. Start the dev server
 
+	npm start
 
-Install dependencies:
+By default, when `REACT_APP_API_URL` is not set, the project runs in development mode and `src/services/api.js` will use built-in mock responses. If you want the app to point to a real backend, set the environment variable `REACT_APP_API_URL` to your API base URL before starting the dev server.
 
----npm install
+On Windows PowerShell you can set it for the current session like this:
 
+	$env:REACT_APP_API_URL = "http://localhost:5000/api"
+	npm start
 
-Start development server:
+Or create a `.env` file in the project root with:
 
----npm start
+	REACT_APP_API_URL=http://localhost:5000/api
 
+Then run `npm start`.
 
-App will run at: http://localhost:3000
+## Environment & mock API behavior
 
-Environment Variables:
-Create .env file if needed:
+- The frontend uses `src/services/api.js`. When `process.env.NODE_ENV === 'development'` or `REACT_APP_API_URL` is not set, the file contains `mockResponses` that handle authentication, searching freelancers, messages, gigs, admin endpoints and payments. This makes the app usable without a backend.
+- Example mock admin credentials: `admin@gigconnect.com` / `admin123` — use these to access the Admin dashboard in development.
+- Search filters supported by the mock API: `skills` (comma separated), `location`, `minPrice`, `maxPrice`, `minRating`.
 
----REACT_APP_API_BASE_URL=http://localhost:5000/api
+## Key files and where to look
 
-Backend Setup
+- `src/services/api.js` — axios instance + mockResponses (development). Good starting point to see available endpoints and mock data shapes.
+- `src/services/socket.js` — socket client used by the messaging UI.
+- `src/components/freelancer/` — Search & Profile components.
+- `src/components/gig/` — CreateGig, GigCard, MyGigs.
+- `src/components/messaging/` — Messages UI and socket event handlers.
+- `src/components/admin/` — AdminDashboard, UserManagement, SystemSettings.
+- `src/styles/App.css` — global styles (search icon visibility and layout fixes were applied here).
 
-Navigate to backend folder:
+## Notes about UI / behavior
 
----cd gigconnect-backend
+- Search icon visibility: the search icon in the Find Freelancers page was adjusted via CSS for consistent sizing.
+- Messaging: uses sockets and keeps references stable to avoid stale closures (see `Messages.js` implementation).
+- Admin logout behavior: if you want logout to redirect to the Home page, confirm and I can implement that for you (it was requested but not yet changed in the codebase).
 
+## Troubleshooting
 
-Install dependencies:
+- If you see unexpected lint or runtime errors after local edits: try restarting the dev server (`Ctrl+C` then `npm start`).
+- If the app fails to reach an API and you expect a real backend, ensure `REACT_APP_API_URL` is set and reachable.
+- Git push rejected because remote contains commits not in local: run `git fetch` then `git pull --rebase` (or `git merge`) to sync before pushing. If you want, I can provide exact safe commands for your situation.
 
----npm install
+## Next steps / suggestions
 
+- (Optional) I can scan the repo for unused files and prepare a safe deletion list (I will not delete anything without your confirmation).
+- (Optional) Implement admin logout redirect to HomePage now if you'd like me to patch it.
+- Add a CONTRIBUTING.md and a few unit tests for key components (messaging, search) if you want higher confidence when making changes.
 
-Environment Variables:
----Create .env file:
+---
 
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+If you want any part of this README expanded (API reference, screenshots, or development scripts), tell me which section and I'll add it.
 
+## Author
 
-Start backend server:
-
----npm run dev
-
-
-Backend API runs at: http://localhost:5000/api
-
-Database Setup (MongoDB)
-
---Sign up for MongoDB Atlas
---Create a new cluster.
---Create a database named gigconnect.
---Create collections:
---users → Stores user info and hashed passwords
---profiles → Freelancer profiles
---gigs → Client gigs and applications
---Copy the connection string and update MONGO_URI in .env.
-
-Folder Structure
-Frontend
-gigconnect-frontend/
-├── public/
-├── src/
-│   ├── components/
-│   ├── context/
-│   ├── pages/
-│   ├── services/
-│   └── App.js
-└── package.json
-
-Backend
-gigconnect-backend/
-├── controllers/
-├── models/
-├── routes/
-├── middleware/
-├── server.js
-└── package.json
-
-Usage
---Register as freelancer or client
---Freelancers can update their profile
---Clients can post gigs
---Freelancers can browse gigs and apply
---Admin can manage users and gigs
-
-Future Enhancements
---Payment gateway integration
---Ratings & reviews for freelancers
---Email notifications
---Advanced search and filters for gigs
-
-This README gives a full guide for developers to set up the project, run the frontend/backend, and connect to MongoDB.
+Yerra Shankar
+📍 Visakhapatnam, Andhra Pradesh
+📧 yerrashankar9392@gmail.com
